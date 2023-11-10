@@ -8,6 +8,7 @@ import com.javahunter.multipleloggers.exception.ResourceNotFoundException;
 import com.javahunter.multipleloggers.exception.UserAlreadyExistsException;
 import com.javahunter.multipleloggers.mapper.UserMapper;
 import com.javahunter.multipleloggers.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,10 +80,11 @@ public class UserServiceImpl implements UserService {
      * @param requestDto
      * @return
      */
+    @Transactional
     @Override
     public boolean updateUser(RequestDto requestDto) {
         serverLogger.info("Request hitting the update  user by email service");
-        if(userRepository.existsByEmail(requestDto.getEmail())){
+        if(!userRepository.existsByEmail(requestDto.getEmail())){
             serverLogger.debug("User with email {} not present",requestDto.getEmail());
             throw new ResourceNotFoundException("Email",requestDto.getEmail());
         }
@@ -92,14 +94,16 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+
     /**
      * @param email
      * @return
      */
+    @Transactional
     @Override
     public boolean userDeleted(String email) {
         serverLogger.info("Request hitting the update  user by email service");
-        if(userRepository.existsByEmail(email)){
+        if(!userRepository.existsByEmail(email)){
             serverLogger.debug("User with email {} not present",email);
             throw new ResourceNotFoundException("Email",email);
         }
